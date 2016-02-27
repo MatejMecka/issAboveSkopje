@@ -8,13 +8,10 @@ from random import randrange
 from threading import Timer
 import threading
 
-
 CONSUMER_KEY = ""
 CONSUMER_SECRET = ""
 ACCESS_KEY = ""
 ACCESS_SECRET = ""
-
-
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
@@ -22,6 +19,7 @@ auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 api = tweepy.API(auth)
 
 tm = ''
+dr = ''
 dt = ''
 sve = dict()
 
@@ -52,33 +50,59 @@ def oncePerWeek():
 				tm = line[6:]
 				print(tm)
 
+			if line.startswith('Duration:'):
+				dr = line[10:11]
+				print(dr)
+
+			if line.startswith('Approach:'):
+				ar = line[10:]
+				ar = ar.replace('above', 'над')
+				ar = ar.replace('N', 'С	')
+				ar = ar.replace('S', 'J')
+				ar = ar.replace('E', 'И')
+				ar = ar.replace('W', 'З')
+				if len(ar) == 11:
+					ar = ar[:9] + '-' + ar[9:]
+				print(ar)
+
+
+			if line.startswith('Departure:'):
+				dp = line[11:]
+				dp = dp.replace('above', 'над')
+				dp = dp.replace('N', 'С')
+				dp = dp.replace('S', 'J')
+				dp = dp.replace('E', 'И')
+				dp = dp.replace('W', 'З')
+				if len(dp) == 11:
+					dp = dp[:9] + '-' + dp[9:]
+				print(dp)
 				if dt not in sve:
 					sve[dt] = []
-				sve[dt].append(tm)
-
-			if line.startswith('Duration:'):
-				dr = line[10:]
-				print(dr)
+				sve[dt].append((tm, dr, ar, dp))
 
 	threading.Timer(604800, oncePerWeek).start()
 
-def pick_msg():
+def pick_msg(dur, app, dpr):
 	foo = ['Сателитот е над Скопје!',
 		'Вселенската Станица го надлетува Скопје во моментов!',
 		'Хјустон! Вселенската Станица е над Скопје!']
 	random_index = randrange(0,len(foo))
 	# post to twitter
-	api.update_status(foo[random_index] + ' Дата: ' + datetime.now().strftime("%A %b %-d, %Y, %-I:%M %p"))
+
+	if dur == 'l':
+		dur = 'помалку од 1'
+
+	api.update_status(foo[random_index] + ' Времетраeње: ' + dur + ' мин.' + ' Приоѓа од: ' + app + ', заминува кон: ' + dpr)
 
 def twitterPost():
 	if datetime.now().strftime("%A %b %-d, %Y") in sve:
 		for t in sve[datetime.now().strftime("%A %b %-d, %Y")]:
-			if datetime.now().strftime("%-I:%M %p") == t:
+			if datetime.now().strftime("%-I:%M %p") == t[0]:
 				print('++++++++++++++++++++++++++++++++++++')
 				print('---------POSTING TO TWITTER---------')
 				print('++++++++++++++++++++++++++++++++++++')
 				# post to twitter func
-				pick_msg()
+				pick_msg(t[1], t[2], t[3])
 			else:
 				print('------------------------------------')
 				print('-----------STILL NOTHING------------')
