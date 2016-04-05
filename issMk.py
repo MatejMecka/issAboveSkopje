@@ -23,11 +23,15 @@ dr = ''
 dt = ''
 sve = dict()
 
+def test():
+	users = api.GetFriends()
+	print (u.name for u in users)
+
 def oncePerWeek():
 	# for testing purposes
 	tree = ET.parse('Macedonia_None_Skopje.xml')
 	root = tree.getroot()
-	#
+
 	# fetched = urllib.request.urlopen('http://spotthestation.nasa.gov/sightings/xml_files/Macedonia_None_Skopje.xml')
 	# tree = ET.parse(fetched)
 	# print(type(tree))
@@ -65,7 +69,6 @@ def oncePerWeek():
 					ar = ar[:9] + '-' + ar[9:]
 				print(ar)
 
-
 			if line.startswith('Departure:'):
 				dp = line[11:]
 				dp = dp.replace('above', 'над')
@@ -94,14 +97,26 @@ def pick_msg(dur, app, dpr):
 
 	api.update_status(foo[random_index] + ' Времетраeње: ' + dur + ' мин.' + ' Приоѓа од: ' + app + ', заминува кон: ' + dpr)
 
+# pick dm and send it to followers
+def pick_dm(dur, app, dpr):
+
+	followers = api.followers_ids(id='issaboveskopje')
+	follower_dm = "Сателитот е над Скопје! Излези!" + ' Времетраeње: ' + dur + ' мин.' + ' Приоѓа од: ' + app + ', заминува кон: ' + dpr
+	for follower in followers:
+		api.send_direct_message(user=follower, text=follower_dm)
+
+
 def twitterPost():
 	if datetime.now().strftime("%A %b %-d, %Y") in sve:
 		for t in sve[datetime.now().strftime("%A %b %-d, %Y")]:
 			if datetime.now().strftime("%-I:%M %p") == t[0]:
+
 				print('++++++++++++++++++++++++++++++++++++')
 				print('---------POSTING TO TWITTER---------')
 				print('++++++++++++++++++++++++++++++++++++')
-				# post to twitter func
+
+				pick_dm(t[1], t[2], t[3])
+				time.sleep(1)
 				pick_msg(t[1], t[2], t[3])
 			else:
 				print('------------------------------------')
