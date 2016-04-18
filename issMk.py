@@ -7,6 +7,7 @@ import sched, time
 from random import randrange
 from threading import Timer
 import threading
+import serial
 
 CONSUMER_KEY = ""
 CONSUMER_SECRET = ""
@@ -15,6 +16,8 @@ ACCESS_SECRET = ""
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
+
+arduinoData = serial.Serial('/dev/ttyUSB0', 9600)
 
 api = tweepy.API(auth)
 
@@ -118,11 +121,12 @@ def twitterPost():
 				pick_dm(t[1], t[2], t[3])
 				time.sleep(1)
 				pick_msg(t[1], t[2], t[3])
+				arduinoData.write(b'1')
 			else:
 				print('------------------------------------')
 				print('-----------STILL NOTHING------------')
 				print('------------------------------------')
-
+				arduinoData.write(b'0')
 		print (datetime.now().strftime("%A %b %-d, %Y"), sve[datetime.now().strftime("%A %b %-d, %Y")])
 
 # start over in 60 sec
