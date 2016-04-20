@@ -9,10 +9,10 @@ from threading import Timer
 import threading
 import serial
 
-CONSUMER_KEY = ""
-CONSUMER_SECRET = ""
-ACCESS_KEY = ""
-ACCESS_SECRET = ""
+CONSUMER_KEY = "NcgnL2jtiRYDq1sdtbBedka75"
+CONSUMER_SECRET = "d7cZFrQhM9T4X3gHmtdrSCZjbqX2mH2LbFIeUxX1K0xvVmzlJB"
+ACCESS_KEY = "701094261509464068-RQpxQ8UsWgIQVGIlHKd6SbCrEsR39sW"
+ACCESS_SECRET =  "q0xoe1PHaje7O5Q9AbpX4FCmPjUxK8NrEOKKI2PRmtOni"
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
@@ -26,9 +26,45 @@ dr = ''
 dt = ''
 sve = dict()
 
-def test():
-	users = api.GetFriends()
-	print (u.name for u in users)
+
+postArt = """
+		The International Space Station is above Skopje!
+	           .       .                   .       .      .     .      .
+    .       . 	.     .    .            .         ______
+      .           .             .               ////////
+                .    .   ________   .  .      /////////     .    .
+           .            |.____.  /\        ./////////    .
+    .                 .//      \/  |\     /////////
+       .       .    .//          \ |  \ /////////       .     .   .
+                    ||.    .    .| |  ///////// .     .
+     .    .         ||           | |//`,/////                .
+             .       \	       ./ //  /  \/   .
+  .                    \.____./ //\` '   ,_\     .     .
+          .           .     \ //////\ , /   \                 .    .
+                       .    ///////// \|  '  |    .
+      .        .          ///////// .   \ _ /          .
+                        /////////                              .
+                 .   ./////////     .
+         .           --------   .                  ..
+  .               .        .         .
+
+             .            ___---___                    .
+       .              .--\        --.     .     .         .
+                    ./.;_.\     __/~ \.
+                   /;  / `-'  __\    . \	.
+ .        .       / ,--'     / .   .;   \        |
+                 | .|       /       __   |      -O-       .
+                |__/    __ |  . ;   \ | . |      |
+                |      /  \_     . ;| \___|
+   .    o       |      \  .~\_ __,--'     |           .
+                 |     | . ; ~~~~\_    __|
+    |             \    \   .  .  ; \  /_/   . 	.
+   -O-        .    \   /         . |  ~/
+    |    .          ~\ \   .      /  /~          o
+  .                   ~--___ ; ___--~
+                 .          ---         .
+			HACKLAB KIKA
+"""
 
 def oncePerWeek():
 	# for testing purposes
@@ -51,15 +87,15 @@ def oncePerWeek():
 			line = line.replace('<br/>', '').strip()
 			if line.startswith('Date:'):
 				dt = line[6:]
-				print(dt)
+				print('\nДата: ', dt)
 
 			if line.startswith('Time:'):
 				tm = line[6:]
-				print(tm)
+				print('Време: ', tm)
 
 			if line.startswith('Duration:'):
 				dr = line[10:11]
-				print(dr)
+				print('Времетраење: ', dr, 'мин.')
 
 			if line.startswith('Approach:'):
 				ar = line[10:]
@@ -70,7 +106,7 @@ def oncePerWeek():
 				ar = ar.replace('W', 'З')
 				if len(ar) == 11:
 					ar = ar[:9] + '-' + ar[9:]
-				print(ar)
+				print('Приоѓа од: ', ar)
 
 			if line.startswith('Departure:'):
 				dp = line[11:]
@@ -81,7 +117,7 @@ def oncePerWeek():
 				dp = dp.replace('W', 'З')
 				if len(dp) == 11:
 					dp = dp[:9] + '-' + dp[9:]
-				print(dp)
+				print('Заминува кон: ', dp)
 				if dt not in sve:
 					sve[dt] = []
 				sve[dt].append((tm, dr, ar, dp))
@@ -114,20 +150,16 @@ def twitterPost():
 		for t in sve[datetime.now().strftime("%A %b %-d, %Y")]:
 			if datetime.now().strftime("%-I:%M %p") == t[0]:
 
-				print('++++++++++++++++++++++++++++++++++++')
-				print('---------POSTING TO TWITTER---------')
-				print('++++++++++++++++++++++++++++++++++++')
+				print(postArt)
 
 				pick_dm(t[1], t[2], t[3])
 				time.sleep(1)
 				pick_msg(t[1], t[2], t[3])
 				arduinoData.write(b'1')
 			else:
-				print('------------------------------------')
-				print('-----------STILL NOTHING------------')
-				print('------------------------------------')
+				print('Сеуште ништо.')
 				arduinoData.write(b'0')
-		print (datetime.now().strftime("%A %b %-d, %Y"), sve[datetime.now().strftime("%A %b %-d, %Y")])
+		#print (datetime.now().strftime("%A %b %-d, %Y"), sve[datetime.now().strftime("%A %b %-d, %Y")])
 
 # start over in 60 sec
 def oncePerMinute():
