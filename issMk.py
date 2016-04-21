@@ -9,8 +9,8 @@ from threading import Timer
 import threading
 import serial
 
-CONSUMER_KEY = "NcgnL2jtiRYDq1sdtbBedka75"
-CONSUMER_SECRET = "d7cZFrQhM9T4X3gHmtdrSCZjbqX2mH2LbFIeUxX1K0xvVmzlJB"
+CONSUMER_KEY = "9XDu9qLKiXP0X1hYUeX6WkaBq"
+CONSUMER_SECRET = "YbTjy5rmhULOaAlsYuM2O2RQhhZLTJsZZLuERaW4yfGoWMhcm3"
 ACCESS_KEY = "701094261509464068-RQpxQ8UsWgIQVGIlHKd6SbCrEsR39sW"
 ACCESS_SECRET =  "q0xoe1PHaje7O5Q9AbpX4FCmPjUxK8NrEOKKI2PRmtOni"
 
@@ -71,10 +71,10 @@ def oncePerWeek():
 	tree = ET.parse('Macedonia_None_Skopje.xml')
 	root = tree.getroot()
 
-	# fetched = urllib.request.urlopen('http://spotthestation.nasa.gov/sightings/xml_files/Macedonia_None_Skopje.xml')
-	# tree = ET.parse(fetched)
-	# print(type(tree))
-	# root = tree.getroot()
+	#fetched = urllib.request.urlopen('http://spotthestation.nasa.gov/sightings/xml_files/Macedonia_None_Skopje.xml')
+	#tree = ET.parse(fetched)
+	#print(type(tree))
+	#root = tree.getroot()
 
 	titles = root.findall('channel/item/title')
 	descriptions = root.findall('channel/item/description')
@@ -158,7 +158,7 @@ def twitterPost():
 				arduinoData.write(b'1')
 			else:
 				print('Сеуште ништо.')
-				arduinoData.write(b'0')
+				arduinoData.write(b'1')
 		#print (datetime.now().strftime("%A %b %-d, %Y"), sve[datetime.now().strftime("%A %b %-d, %Y")])
 
 # start over in 60 sec
