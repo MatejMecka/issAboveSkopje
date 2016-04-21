@@ -1,25 +1,28 @@
 import xml.etree.ElementTree as ET
-from datetime import datetime, date, time
 import urllib.request
 import tweepy
-from time import time, sleep
 import sched, time
-from random import randrange
-from threading import Timer
 import threading
 import serial
+from time import time, sleep
+from random import randrange
+from threading import Timer
+from datetime import datetime, date, time
 
-CONSUMER_KEY = "9XDu9qLKiXP0X1hYUeX6WkaBq"
-CONSUMER_SECRET = "YbTjy5rmhULOaAlsYuM2O2RQhhZLTJsZZLuERaW4yfGoWMhcm3"
-ACCESS_KEY = "701094261509464068-RQpxQ8UsWgIQVGIlHKd6SbCrEsR39sW"
-ACCESS_SECRET =  "q0xoe1PHaje7O5Q9AbpX4FCmPjUxK8NrEOKKI2PRmtOni"
+# This is for the tokens, don't mind it
+import conf
+from conf import *
 
+# Twitter auth.
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
-
-arduinoData = serial.Serial('/dev/ttyUSB0', 9600)
-
 api = tweepy.API(auth)
+
+# Connect to Arduino (Optional, for lights)
+try:
+	arduinoData = serial.Serial('/dev/ttyUSB0', 9600)
+except Exception as e:
+	print(e)
 
 tm = ''
 dr = ''
@@ -66,14 +69,15 @@ postArt = """
 			HACKLAB KIKA
 """
 
-def oncePerWeek():
-	# for testing purposes
+# Take the RSS feed once per day, split the lines (date, time, approach etc..) and read them
+
+def oncePerDay():
+	# Using local XML for testing purposes
 	tree = ET.parse('Macedonia_None_Skopje.xml')
 	root = tree.getroot()
 
 	#fetched = urllib.request.urlopen('http://spotthestation.nasa.gov/sightings/xml_files/Macedonia_None_Skopje.xml')
 	#tree = ET.parse(fetched)
-	#print(type(tree))
 	#root = tree.getroot()
 
 	titles = root.findall('channel/item/title')
@@ -92,6 +96,7 @@ def oncePerWeek():
 			if line.startswith('Time:'):
 				tm = line[6:]
 				print('Време: ', tm)
+
 
 			if line.startswith('Duration:'):
 				dr = line[10:11]
@@ -122,21 +127,23 @@ def oncePerWeek():
 					sve[dt] = []
 				sve[dt].append((tm, dr, ar, dp))
 
-	threading.Timer(604800, oncePerWeek).start()
+	threading.Timer(86400, oncePerDay).start()
+
+# Picks random message to make the tweet
 
 def pick_msg(dur, app, dpr):
 	foo = ['Сателитот е над Скопје!',
 		'Вселенската Станица го надлетува Скопје во моментов!',
 		'Хјустон! Вселенската Станица е над Скопје!']
 	random_index = randrange(0,len(foo))
-	# post to twitter
 
 	if dur == 'l':
 		dur = 'помалку од 1'
 
+	# Post status on Twitter
 	api.update_status(foo[random_index] + ' Времетраeње: ' + dur + ' мин.' + ' Приоѓа од: ' + app + ', заминува кон: ' + dpr)
 
-# pick dm and send it to followers
+# pick DM and send it to followers
 def pick_dm(dur, app, dpr):
 
 	followers = api.followers_ids(id='issaboveskopje')
@@ -144,27 +151,36 @@ def pick_dm(dur, app, dpr):
 	for follower in followers:
 		api.send_direct_message(user=follower, text=follower_dm)
 
-
+# Check if the datetime.now is the same as the time of the RSS feed, if so, post to twitter
 def twitterPost():
 	if datetime.now().strftime("%A %b %-d, %Y") in sve:
 		for t in sve[datetime.now().strftime("%A %b %-d, %Y")]:
 			if datetime.now().strftime("%-I:%M %p") == t[0]:
 
 				print(postArt)
-
-				pick_dm(t[1], t[2], t[3])
-				time.sleep(1)
-				pick_msg(t[1], t[2], t[3])
-				arduinoData.write(b'1')
+				# Try to post a tweet and send DM
+				try:
+					pick_dm(t[1], t[2], t[3])
+					time.sleep(1)
+					pick_msg(t[1], t[2], t[3])
+				except Exception as e:
+					print(e)
+				# Try to light up the lights
+				try:
+					arduinoData.write(b'1')
+				except Exception as e:
+					print(e)
 			else:
 				print('Сеуште ништо.')
-				arduinoData.write(b'1')
-		#print (datetime.now().strftime("%A %b %-d, %Y"), sve[datetime.now().strftime("%A %b %-d, %Y")])
+				try:
+					arduinoData.write(b'1')
+				except Exception as e:
+					print(e)
 
-# start over in 60 sec
+# Check the datetime again in 60 secs.
 def oncePerMinute():
 	twitterPost()
 	threading.Timer(60, oncePerMinute).start()
 
 oncePerMinute()
-oncePerWeek()
+oncePerDay()
