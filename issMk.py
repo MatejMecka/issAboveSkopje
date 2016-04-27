@@ -18,6 +18,8 @@ auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 api = tweepy.API(auth)
 
+followers = api.followers_ids(id='issaboveskopje')
+
 # Connect to Arduino (Optional, for lights)
 try:
 	arduinoData = serial.Serial('/dev/ttyUSB0', 9600)
@@ -68,6 +70,7 @@ postArt = """
                  .          ---         .
 			HACKLAB KIKA
 """
+
 
 # Take the RSS feed once per day, split the lines (date, time, approach etc..) and read them
 
@@ -143,13 +146,34 @@ def pick_msg(dur, app, dpr):
 	# Post status on Twitter
 	api.update_status(foo[random_index] + ' Времетраeње: ' + dur + ' мин.' + ' Приоѓа од: ' + app + ', заминува кон: ' + dpr)
 
-# pick DM and send it to followers
-def pick_dm(dur, app, dpr):
+# Check if someone wants disable DM's
+def statusMentions():
+	mentions = api.mentions_timeline()
+	disabled_set = set()
 
-	followers = api.followers_ids(id='issaboveskopje')
+	for mention in mentions:
+		if mention.text == '@ISSAboveSkopje disableDM':
+			disabled_set.add(str(mention.user.id))
+			with open('disabledUsers.txt', 'a') as d:
+				d.write('Disabled DM for ' + mention.user.screen_name  + ' with ID ' + str(mention.user.id) + ' at ' + str(mention.created_at) + '\n')
+	print(disabled_set)
+	print(','.join([str(x) for x in followers]))
+	with open('ids.txt', 'w') as w:
+		for follower in followers:
+			if str(follower) in disabled_set: continue
+			w.write(str(follower) + '\n')
+
+	threading.Timer(40, statusMentions).start()
+
+# Send DM to followers.
+def pick_dm(dur, app, dpr):
+	with open('ids.txt', 'r+') as s:
+		lines = s.readlines()
+		#print(lines)
 	follower_dm = "Сателитот е над Скопје! Излези!" + ' Времетраeње: ' + dur + ' мин.' + ' Приоѓа од: ' + app + ', заминува кон: ' + dpr
-	for follower in followers:
-		api.send_direct_message(user=follower, text=follower_dm)
+	for follower_id in lines:
+		print(follower_id)
+		api.send_direct_message(user=follower_id, text=follower_dm)
 
 # Check if the datetime.now is the same as the time of the RSS feed, if so, post to twitter
 def twitterPost():
@@ -182,5 +206,6 @@ def oncePerMinute():
 	twitterPost()
 	threading.Timer(60, oncePerMinute).start()
 
+statusMentions()
 oncePerMinute()
 oncePerDay()
