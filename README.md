@@ -7,12 +7,7 @@ is above Skopje and if so, tweets about it - and turns ON LED lights. You can fi
 
 ## Getting Started
 
-Firstly, not to get confused, I'm using a file NOT uploaded on this repo called "conf.py"
-where I have stored my Twitter authentication tokens, and then I'm importing the file (conf.py) from
-the issMk.py script.
-
-You're going to need this lines added in the issMk.py or any other file and then import it in order to get
-the authentication. Replace the "VALUE" with the right key from your Twitter APP.
+Firstly, repalace the "VALUE" with your own tokens in the issMk.py file.
 
 ```
 CONSUMER_KEY = "VALUE"
@@ -37,8 +32,8 @@ and replace it with your link (You can find it here: http://spotthestation.nasa.
 
 ### How it works
 
-Basically, the script checks the RSS feed and compares the time (when the ISS is above) with your system time. If it is, it posts status on twitter and sends DM's to all the followers. The file ids.txt stores the ID's of all the followers and if someone wants to disable getting DM's from the account, tweets '@ISSAboveSkopje disableDM' and the script removes that ID from the list while the file
-disabledUsers.txt collects full data of those who disabled the DM's (time, ID, username).
+Basically, the script checks the RSS feed and compares the time (when the ISS is above) with your system time. If it is, it posts status on twitter and sends DM's to all the followers. The file ids.txt stores the ID's of all the followers and if someone wants to disable getting DM's from the account, tweets '@ISSAboveSkopje disableDM' and the script removes that ID from 
+the list. The script uses the list to send DM's to the followers. 
 
 ### Lighting up LED's
 I'm using Arduino to get the lights ON. There is a script uploaded on this repo which you can copy and change for your own needs. How it works, basically, when the ISS is above, the script writes data to the Arduino port (1 or 0).
