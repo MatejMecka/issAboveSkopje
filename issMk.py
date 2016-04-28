@@ -9,7 +9,7 @@ from random import randrange
 from threading import Timer
 from datetime import datetime, date, time
 
-# Twitter auth. (replace "VALUE" with your tokens)
+# Twitter auth. (replace "VALUE" with your own tokens)
 
 CONSUMER_KEY = "VALUE"
 CONSUMER_SECRET = "VALUE"
