@@ -1,3 +1,5 @@
+
+
 # issAboveSkopje
 
 The issAboveSkopje (Internation Space Station above Skopje) is a micro-project which checks if the ISS
@@ -35,7 +37,11 @@ and replace it with your link (You can find it here: http://spotthestation.nasa.
 
 ### How it works
 
-Basically, the script checks the RSS feed and compares the time (when the ISS is above) with your system time.
+Basically, the script checks the RSS feed and compares the time (when the ISS is above) with your system time. If it is, it posts status on twitter and sends DM's to all the followers. The file ids.txt stores the ID's of all the followers and if someone wants to disable getting DM's from the account, tweets '@ISSAboveSkopje disableDM' and the script removes that ID from the list while the file
+disabledUsers.txt collects full data of those who disabled the DM's (time, ID, username).
+
+### Lighting up LED's
+I'm using Arduino to get the lights ON. There is a script uploaded on this repo which you can copy and change for your own needs. How it works, basically, when the ISS is above, the script writes data to the Arduino port (1 or 0).
 
 ### Running the script
 
