@@ -9,11 +9,13 @@ from random import randrange
 from threading import Timer
 from datetime import datetime, date, time
 
-# This is for the tokens, don't mind it
-import conf
-from conf import *
+# Twitter auth. (replace "VALUE" with your tokens)
 
-# Twitter auth.
+CONSUMER_KEY = "VALUE"
+CONSUMER_SECRET = "VALUE"
+ACCESS_KEY = "VALUE"
+ACCESS_SECRET =  "VALUE"
+
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 api = tweepy.API(auth)
@@ -76,12 +78,12 @@ postArt = """
 
 def oncePerDay():
 	# Using local XML for testing purposes
-	tree = ET.parse('Macedonia_None_Skopje.xml')
-	root = tree.getroot()
-
-	#fetched = urllib.request.urlopen('http://spotthestation.nasa.gov/sightings/xml_files/Macedonia_None_Skopje.xml')
-	#tree = ET.parse(fetched)
+	#tree = ET.parse('Macedonia_None_Skopje.xml')
 	#root = tree.getroot()
+
+	fetched = urllib.request.urlopen('http://spotthestation.nasa.gov/sightings/xml_files/Macedonia_None_Skopje.xml')
+	tree = ET.parse(fetched)
+	root = tree.getroot()
 
 	titles = root.findall('channel/item/title')
 	descriptions = root.findall('channel/item/description')
@@ -154,8 +156,7 @@ def statusMentions():
 	for mention in mentions:
 		if mention.text == '@ISSAboveSkopje disableDM':
 			disabled_set.add(str(mention.user.id))
-			with open('disabledUsers.txt', 'a') as d:
-				d.write('Disabled DM for ' + mention.user.screen_name  + ' with ID ' + str(mention.user.id) + ' at ' + str(mention.created_at) + '\n')
+			
 	print(disabled_set)
 	print(','.join([str(x) for x in followers]))
 	with open('ids.txt', 'w') as w:
