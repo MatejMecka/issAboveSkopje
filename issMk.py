@@ -8,6 +8,7 @@ from time import time, sleep
 from random import randrange
 from threading import Timer
 from datetime import datetime, date, time
+from config import *
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
