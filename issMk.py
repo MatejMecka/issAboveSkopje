@@ -9,13 +9,6 @@ from random import randrange
 from threading import Timer
 from datetime import datetime, date, time
 
-# Twitter auth. (replace "VALUE" with your own tokens)
-
-CONSUMER_KEY = "VALUE"
-CONSUMER_SECRET = "VALUE"
-ACCESS_KEY = "VALUE"
-ACCESS_SECRET =  "VALUE"
-
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 api = tweepy.API(auth)
