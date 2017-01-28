@@ -5,7 +5,7 @@ is above Skopje and if so, tweets about it - and turns ON LED lights. You can fi
 
 ## Getting Started
 
-Firstly, repalace the "VALUE" with your own tokens in the issMk.py file.
+Firstly, repalace the "VALUE" with your own tokens in the `config.py` file.
 
 ```
 CONSUMER_KEY = "VALUE"
